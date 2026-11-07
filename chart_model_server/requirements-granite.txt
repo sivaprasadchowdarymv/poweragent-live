@@ -1,0 +1,13 @@
+# Granite Vision chart server (all free / open source).
+# 1) Install PyTorch FIRST (pick one):
+#      NVIDIA GPU:  pip install torch --index-url https://download.pytorch.org/whl/cu128
+#      CPU only:    pip install torch
+# 2) Then:         pip install -r requirements-granite.txt
+transformers>=5.8.0     # version stated on the Granite Vision 4.1 model card
+peft>=0.19.1
+tokenizers>=0.22.2
+accelerate>=1.0
+pillow>=10.0
+huggingface_hub>=0.30
+# Optional, only for --quant 4bit on an NVIDIA GPU:
+# bitsandbytes>=0.45

@@ -1,0 +1,20 @@
+# Same server settings as RAG∞ Ultimate (works locally and on Streamlit Community Cloud).
+# Local runs bind to this computer only via run_windows.bat (--server.address 127.0.0.1).
+[server]
+headless = true
+maxUploadSize = 50
+enableXsrfProtection = true
+enableCORS = true
+
+[browser]
+gatherUsageStats = false
+
+[client]
+showErrorDetails = false
+toolbarMode = "viewer"
+
+[theme.light]
+primaryColor = "#3B6FE0"
+
+[theme.dark]
+primaryColor = "#6F95F0"

@@ -1,0 +1,35 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+body{margin:0;font-family:system-ui,'Segoe UI',sans-serif;font-size:14px;color:#888}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{padding:7px 14px;border-radius:8px;border:1px solid #3B6FE0;background:#3B6FE0;color:#fff;cursor:pointer;font-size:14px}
+button.stop{background:transparent;color:#D64545;border-color:#D64545}
+video{max-width:100%;max-height:110px;border-radius:8px;margin-top:6px;display:none}
+</style></head><body>
+<div class="row"><button id="go">🖥️ Share a tab</button><button id="stop" class="stop" style="display:none">■ Stop sharing</button><span id="st">Not sharing.</span></div>
+<video id="v" autoplay muted playsinline></video>
+<script>
+// Minimal Streamlit component protocol (no build step, no npm).
+const send=(type,data)=>window.parent.postMessage(Object.assign({isStreamlitMessage:true,type},data),"*");
+let args={interval:2,max_px:1600,quality:0.8},stream=null,timer=null,n=0;
+window.addEventListener("message",e=>{const d=e.data||{};if(d.type==="streamlit:render"){args=Object.assign(args,d.args||{});}});
+send("streamlit:componentReady",{apiVersion:1});send("streamlit:setFrameHeight",{height:190});
+const v=document.getElementById("v"),st=document.getElementById("st"),go=document.getElementById("go"),stop=document.getElementById("stop");
+function grab(){
+  if(!stream||!v.videoWidth)return;
+  const s=Math.min(1,args.max_px/Math.max(v.videoWidth,v.videoHeight));
+  const c=document.createElement("canvas");c.width=Math.round(v.videoWidth*s);c.height=Math.round(v.videoHeight*s);
+  c.getContext("2d").drawImage(v,0,0,c.width,c.height);
+  n++;send("streamlit:setComponentValue",{value:{seq:n,ts:Date.now(),jpeg:c.toDataURL("image/jpeg",args.quality)},dataType:"json"});
+  st.textContent=`Sharing · frame ${n} sent (${c.width}×${c.height}) every ${args.interval}s`;
+}
+function end(){if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;clearInterval(timer);v.style.display="none";
+  go.style.display="";stop.style.display="none";st.textContent="Not sharing.";}
+go.onclick=async()=>{
+  try{stream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:5},audio:false});}
+  catch(e){st.textContent="Sharing was cancelled or is not allowed: "+e.message;return;}
+  v.srcObject=stream;v.style.display="block";go.style.display="none";stop.style.display="";
+  stream.getVideoTracks()[0].onended=end;setTimeout(grab,800);timer=setInterval(grab,Math.max(1,args.interval)*1000);
+};
+stop.onclick=end;
+</script></body></html>
