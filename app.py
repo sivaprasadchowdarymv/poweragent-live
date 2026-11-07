@@ -25,6 +25,7 @@ from ui.analytics import analytics_tab  # noqa: E402
 from ui.browser_capture import browser_capture_panel  # noqa: E402
 from ui.chat import chat_page  # noqa: E402
 from ui.data_sources import data_sources_tab  # noqa: E402
+from ui.guide import guide_page  # noqa: E402
 from ui.monitor import monitor_tab  # noqa: E402
 from ui.panels import alerts_tab, diagnostics_tab, history_tab, settings_tab  # noqa: E402
 from ui.state import get_runtime, init_session, new_conversation, open_conversation, password_ok, provider_status  # noqa: E402
@@ -70,8 +71,10 @@ def main() -> None:
     def page(fn, title, icon, default=False):
         return st.Page(lambda: fn(rt), title=title, icon=icon, url_path=title.lower().replace(" ", "_"), default=default)
 
+    chat = page(chat_page, "Chat", "💬", True)
+    st.session_state.chat_page = chat
     nav = st.navigation([
-        page(chat_page, "Chat", "💬", True), page(monitor_tab, "Live Monitor", "🖥️"), page(data_sources_tab, "Data", "📁"),
+        chat, page(guide_page, "How to use", "📘"), page(monitor_tab, "Live Monitor", "🖥️"), page(data_sources_tab, "Data", "📁"),
         page(analytics_tab, "Analytics", "📈"), page(alerts_tab, "Alerts", "🚨"), page(history_tab, "History", "🗂️"),
         page(settings_tab, "Settings", "⚙️"), page(diagnostics_tab, "Diagnostics", "🩺"),
     ])

@@ -1,3 +1,5 @@
 -r requirements.txt
 pytest>=8
+matplotlib>=3.8   # draws the synthetic test charts
+pyarrow>=15       # ChartNet benchmark test (parquet)
 ruff>=0.5
