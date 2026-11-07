@@ -104,14 +104,18 @@ def _feedback(rt: Runtime, conv, msg, question: str) -> None:
 def chat_page(rt: Runtime) -> None:
     conv = current_conversation(rt)
     conv_store, _, prefs = stores(rt)
+    from ui.guide import QUESTIONS, checklist
+
+    checklist(rt, compact=bool(conv.messages))
     if not conv.messages:
-        st.markdown("#### Ask about your live screen or uploaded data")
-        st.caption("Numbers are computed in Python from OCR, the chart reader and your files; the AI only explains them, with [REF-n] citations that are checked before you see the answer.")
-        cols = st.columns(3)
-        for i, ex in enumerate(EXAMPLES):
-            if cols[i % 3].button(ex, key=f"ex{i}", width="stretch"):
-                st.session_state.pending_q = ex
-                st.rerun()
+        st.markdown("#### Ask about your shared screen")
+        for group, qs in QUESTIONS.items():
+            st.caption(group)
+            cols = st.columns(len(qs))
+            for i, ex in enumerate(qs):
+                if cols[i].button(ex, key=f"ex-{group}-{i}", width="stretch"):
+                    st.session_state.pending_q = ex
+                    st.rerun()
     last_q = ""
     for m in conv.messages:
         with st.chat_message(m.role):
